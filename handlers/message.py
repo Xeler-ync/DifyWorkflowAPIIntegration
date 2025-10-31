@@ -17,7 +17,7 @@ class MessageHandler(APIHandler):
                 self.write_json({"error": "Missing sessionId or content"})
                 return
 
-            session = await chat_manager.get_session(session_id)
+            session = chat_manager.get_session(session_id)
             if not session:
                 self.set_status(404)
                 self.write_json({"error": "Session not found"})
