@@ -67,35 +67,59 @@ const sendMessage = async () => {
 
   // 如果没有会话ID，创建新会话
   if (!currentSessionId && isTemporarySession.value) {
+    // I do not know what the fuck, but if it is a new session,
+    // the message array ​​will have an fucking extra message from AI.
+    // So if it is a new session, do not push the fucking message from AI to the fucking messages array activly.
     const response = await chatService.createChat()
     currentSessionId = response.sessionId
     emit('session-created', currentSessionId)
     isTemporarySession.value = false
-  }
 
-  if (!currentSessionId) return
+    if (!currentSessionId) return
 
-  try {
-    messages.value.push({
-      username: "用户",
-      content: inputMessage.value,
-      position: "right",
-      avatar: "/fywy.gif",
-      timestamp: Date.now(),  // 添加时间戳
-    } as Message);
+    try {
+      messages.value.push({
+        username: "用户",
+        content: inputMessage.value,
+        position: "right",
+        avatar: "/fywy.gif",
+        timestamp: Date.now(),  // 添加时间戳
+      } as Message);
 
-    const response = await chatService.sendMessage({
-      sessionId: currentSessionId,
-      content: inputMessage.value,
-    })
-    messages.value.push({
-      ...response.message,
-      timestamp: Date.now(), // 确保添加时间戳
-    });
-    inputMessage.value = ''
-    scrollToBottom()
-  } catch (error) {
-    console.error('发送消息失败:', error)
+      await chatService.sendMessage({
+        sessionId: currentSessionId,
+        content: inputMessage.value,
+      })
+      inputMessage.value = ''
+      scrollToBottom()
+    } catch (error) {
+      console.error('发送消息失败:', error)
+    }
+  } else {
+    if (!currentSessionId) return
+
+    try {
+      messages.value.push({
+        username: "用户",
+        content: inputMessage.value,
+        position: "right",
+        avatar: "/fywy.gif",
+        timestamp: Date.now(),  // 添加时间戳
+      } as Message);
+
+      const response = await chatService.sendMessage({
+        sessionId: currentSessionId,
+        content: inputMessage.value,
+      })
+      messages.value.push({
+        ...response.message,
+        timestamp: Date.now(), // 确保添加时间戳
+      });
+      inputMessage.value = ''
+      scrollToBottom()
+    } catch (error) {
+      console.error('发送消息失败:', error)
+    }
   }
 }
 
