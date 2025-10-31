@@ -80,7 +80,7 @@ const sendMessage = async () => {
       username: "用户",
       content: inputMessage.value,
       position: "right",
-      avatar: "https://avatars.githubusercontent.com/u/2?v=4",
+      avatar: "/fywy.gif",
       timestamp: Date.now(),  // 添加时间戳
     } as Message);
 

@@ -28,7 +28,7 @@ class MessageHandler(APIHandler):
                 username="用户",
                 content=content,
                 position="right",
-                avatar="https://avatars.githubusercontent.com/u/2?v=4",
+                avatar="/fywy.gif",
             )
             session.add_message(user_message)
 
@@ -37,7 +37,7 @@ class MessageHandler(APIHandler):
                 username="AI助手",
                 content=f"你说：{content}",  # 简单的echo回复
                 position="left",
-                avatar="https://avatars.githubusercontent.com/u/1?v=4",
+                avatar="/nwlt.jpg",
             )
             session.add_message(ai_message)
             # 保存会话
