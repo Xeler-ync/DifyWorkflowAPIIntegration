@@ -31,7 +31,7 @@ def make_app():
 
 if __name__ == "__main__":
     app = make_app()
-    app.listen(3000, '0.0.0.0')
-    print("Server is running on http://localhost:3000")
+    app.listen(54798, "0.0.0.0")
+    print("Server is running on http://localhost:54798")
     tornado.autoreload.start()  # 启动自动重载
     tornado.ioloop.IOLoop.current().start()
