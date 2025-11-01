@@ -208,3 +208,7 @@ __marimo__/
 
 .vscode
 data/
+
+!training/data/
+training/models/
+training/data/corpus_tokenized.txt
