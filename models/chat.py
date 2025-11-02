@@ -1,35 +1,49 @@
-import asyncio
+import requests
 from typing import List, Dict, Optional
 from .session import ChatSession
 from .message import Message
-from .database import Database
+from config import config, DIFY_AUTHORIZATION
 
 
 class ChatManager:
     def __init__(self):
         self.sessions: Dict[str, ChatSession] = {}
-        self.db = Database()
-        asyncio.run(self.load_data())
-
-    async def load_data(self):
-        """从JSON文件加载聊天数据"""
-        try:
-            sessions_data = await self.db.load_all_sessions()
-            for session_data in sessions_data:
-                session = ChatSession.from_dict(session_data)
-                self.sessions[session.id] = session
-        except Exception as e:
-            print(f"加载数据失败: {e}")
-
-    async def save_session(self, session: ChatSession):
-        """保存会话到JSON文件"""
-        try:
-            await self.db.save_session(session.id, session.to_dict())
-        except Exception as e:
-            print(f"保存会话失败: {e}")
 
     def get_session(self, session_id: str) -> Optional[ChatSession]:
-        return self.sessions.get(session_id)
+        has_more = True
+        history = []
+        while has_more:
+            response = requests.get(
+                f"{config.dify.dify_endpoint}/messages",
+                params={"user": config.dify.user, "conversation_id": session_id},
+                headers={"Authorization": DIFY_AUTHORIZATION},
+            )
+
+            data = response.json()
+            his = []
+            for item in data["data"]:
+                his.append(
+                    Message(
+                        username="用户",
+                        content=item["query"],
+                        position="right",
+                        timestamp=item["created_at"],
+                        avatar="fywy.gif",
+                    )
+                )
+                his.append(
+                    Message(
+                        username="AI助手",
+                        content=item["answer"],
+                        position="left",
+                        timestamp=item["created_at"],
+                        avatar="nwlt.jpg",
+                    )
+                )
+            history.extend(his)
+            has_more = data["has_more"]
+
+        return history
 
     def create_session(self) -> ChatSession:
         session = ChatSession()
@@ -45,23 +59,52 @@ class ChatManager:
         return session
 
     async def delete_session(self, session_id: str) -> bool:
-        if session_id in self.sessions:
-            try:
-                await self.db.delete_session(session_id)
-                del self.sessions[session_id]
+        try:
+            response = requests.delete(
+                f"{config.dify.dify_endpoint}/conversations/{session_id}",
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": DIFY_AUTHORIZATION,
+                },
+                json={"user": config.dify.user},
+            )
+
+            if response.status_code == 204:
+                if session_id in self.sessions:
+                    del self.sessions[session_id]
                 return True
-            except Exception as e:
-                print(f"删除会话失败: {e}")
-        return False
+            return False
+        except Exception as e:
+            print(f"删除会话失败: {e}")
+            return False
 
     def get_session_messages(self, session_id: str) -> List[Message]:
         """获取特定会话的所有消息"""
         session = self.get_session(session_id)
         if session:
-            return session.messages
+            return session
         return []
 
-    def get_all_sessions(self) -> List[ChatSession]:
+    def get_all_sessions(
+        self, last_id: str | None = None, limit: int = 20
+    ) -> List[ChatSession]:
+        response = requests.get(
+            f"{config.dify.dify_endpoint}/conversations",
+            params={"user": config.dify.user, "last_id": last_id, "limit": limit},
+            headers={"Authorization": DIFY_AUTHORIZATION},
+        )
+
+        data = response.json()
+        self.sessions = {
+            item["id"]: ChatSession(
+                id=item["id"],
+                title=item["name"],
+                created_at=int(item["created_at"] * 1000),
+                updated_at=int(item["updated_at"] * 1000),
+            )
+            for item in data["data"]
+        }
         return list(self.sessions.values())
 
 

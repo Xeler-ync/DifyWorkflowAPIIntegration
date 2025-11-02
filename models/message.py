@@ -5,14 +5,19 @@ from typing import Optional
 
 class Message:
     def __init__(
-        self, username: str, content: str, position: str, avatar: Optional[str] = None
+        self,
+        username: str,
+        content: str,
+        position: str,
+        timestamp: int = None,
+        avatar: Optional[str] = None,
     ):
         self.id = str(uuid.uuid4())
         self.username = username
         self.content = content
         self.position = position
-        self.timestamp = int(datetime.now().timestamp() * 1000)
-        self.avatar = avatar or "./asseets/vue.svg"
+        self.timestamp = timestamp or int(datetime.now().timestamp() * 1000)
+        self.avatar = avatar or "/favicon.ico"
 
     @classmethod
     def from_dict(cls, data: dict) -> "Message":

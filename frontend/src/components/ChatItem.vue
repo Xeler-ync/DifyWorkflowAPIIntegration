@@ -59,6 +59,7 @@ const formatTime = (timestamp: number) => {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  flex-shrink: 0;
   overflow: hidden;
 }
 

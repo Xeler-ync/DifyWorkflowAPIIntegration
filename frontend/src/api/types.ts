@@ -27,5 +27,6 @@ export interface SendMessageRequest {
 }
 
 export interface SendMessageResponse {
+  sessionId: string
   message: Message
 }

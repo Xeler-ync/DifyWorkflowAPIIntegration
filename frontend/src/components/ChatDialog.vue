@@ -46,82 +46,57 @@ const initSession = async () => {
     // 加载历史会话
     messages.value = await chatService.getChatMessages(props.sessionId)
   } else {
-    // 创建临时会话，不立即创建服务器会话
-    isTemporarySession.value = true
+    // 显示欢迎消息
     messages.value = [{
-      id: window.crypto.randomUUID(),  // 添加唯一ID
+      id: window.crypto.randomUUID(),
       username: "AI助手",
       content: "你好！我是AI助手，有什么可以帮助你的吗？",
       position: "left",
       avatar: "/nwlt.jpg",
-      timestamp: Date.now(),  // 添加时间戳
+      timestamp: Date.now(),
     }]
   }
 }
+
 
 // 发送消息
 const sendMessage = async () => {
   if (!inputMessage.value.trim()) return
 
-  let currentSessionId = props.sessionId
+  try {
+    // 添加用户消息到界面
+    messages.value.push({
+      username: "用户",
+      content: inputMessage.value,
+      position: "right",
+      avatar: "/fywy.gif",
+      timestamp: Date.now(),
+    } as Message);
 
-  // 如果没有会话ID，创建新会话
-  if (!currentSessionId && isTemporarySession.value) {
-    // I do not know what the fuck, but if it is a new session,
-    // the message array ​​will have an fucking extra message from AI.
-    // So if it is a new session, do not push the fucking message from AI to the fucking messages array activly.
-    const response = await chatService.createChat()
-    currentSessionId = response.sessionId
-    emit('session-created', currentSessionId)
-    isTemporarySession.value = false
+    // 发送消息到后端
+    const response = await chatService.sendMessage({
+      sessionId: props.sessionId || "",  // 如果没有sessionId则传空字符串
+      content: inputMessage.value,
+    });
 
-    if (!currentSessionId) return
-
-    try {
-      messages.value.push({
-        username: "用户",
-        content: inputMessage.value,
-        position: "right",
-        avatar: "/fywy.gif",
-        timestamp: Date.now(),  // 添加时间戳
-      } as Message);
-
-      await chatService.sendMessage({
-        sessionId: currentSessionId,
-        content: inputMessage.value,
-      })
-      inputMessage.value = ''
-      scrollToBottom()
-    } catch (error) {
-      console.error('发送消息失败:', error)
+    // 如果是新会话，通知父组件
+    if (!props.sessionId && response.sessionId) {
+      emit('session-created', response.sessionId);
     }
-  } else {
-    if (!currentSessionId) return
 
-    try {
-      messages.value.push({
-        username: "用户",
-        content: inputMessage.value,
-        position: "right",
-        avatar: "/fywy.gif",
-        timestamp: Date.now(),  // 添加时间戳
-      } as Message);
+    // 添加AI回复到界面
+    messages.value.push({
+      ...response.message,
+      timestamp: Date.now(),
+    });
 
-      const response = await chatService.sendMessage({
-        sessionId: currentSessionId,
-        content: inputMessage.value,
-      })
-      messages.value.push({
-        ...response.message,
-        timestamp: Date.now(), // 确保添加时间戳
-      });
-      inputMessage.value = ''
-      scrollToBottom()
-    } catch (error) {
-      console.error('发送消息失败:', error)
-    }
+    inputMessage.value = '';
+    scrollToBottom();
+  } catch (error) {
+    console.error('发送消息失败:', error);
   }
 }
+
 
 // 滚动到底部
 const scrollToBottom = () => {

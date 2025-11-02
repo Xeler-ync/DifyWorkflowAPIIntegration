@@ -1,4 +1,9 @@
 {
+    "dify": {
+        "dify_endpoint": "http://localhost/v1",
+        "dify_api_key": "app-CDS521CDS521CDS521CDS521",
+        "user": "fywy"
+    },
     "address": "0.0.0.0",
     "port": 54798,
     "log_level": "WARNING"

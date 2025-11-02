@@ -4,8 +4,13 @@ from models.chat import chat_manager
 
 class ChatListHandler(APIHandler):
     async def get(self):
-        """获取所有聊天会话"""
-        sessions = chat_manager.get_all_sessions()
+        """获取所有聊天会话，支持分页"""
+        last_id = self.get_argument("last_id", "")
+        limit = int(self.get_argument("limit", "20"))
+
+        sessions = chat_manager.get_all_sessions(last_id, limit)
+        has_more = len(sessions) == limit
+
         self.write_json([session.to_dict() for session in sessions])
 
     async def post(self):
