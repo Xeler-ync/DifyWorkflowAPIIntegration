@@ -6,11 +6,16 @@ import shutil
 
 class Config:
     def __init__(
-        self, address: str = "0.0.0.0", port: int = 54798, log_level: str = "WARNING"
+        self,
+        address: str = "0.0.0.0",
+        port: int = 54798,
+        log_level: str = "WARNING",
+        deepseek_api_key: str = None,
     ):
         self.address = address
         self.port = port
         self.log_level = getattr(logging, log_level, logging.INFO)
+        self.deepseek_api_key = deepseek_api_key
 
     @classmethod
     def from_dict(cls, config_dict: dict):
@@ -18,13 +23,21 @@ class Config:
             address=config_dict.get("address", "0.0.0.0"),
             port=config_dict.get("port", 54798),
             log_level=config_dict.get("log_level", "WARNING"),
+            deepseek_api_key=config_dict.get(
+                "deepseek_api_key", "your_deepseek_api_key"
+            ),
         )
 
     def to_dict(self) -> dict:
-        return {"address": self.address, "port": self.port, "log_level": self.log_level}
+        return {
+            "address": self.address,
+            "port": self.port,
+            "log_level": self.log_level,
+            "deepseek_api_key": self.deepseek_api_key,
+        }
 
     def __str__(self) -> str:
-        return f"Config(address='{self.address}', port={self.port}, log_level='{self.log_level})"
+        return f"Config(address='{self.address}', port={self.port}, log_level='{self.log_level}, deepseek_api_key='{self.deepseek_api_key}')"
 
     def __repr__(self) -> str:
         return self.__str__()
