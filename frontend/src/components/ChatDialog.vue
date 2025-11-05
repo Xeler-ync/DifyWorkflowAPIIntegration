@@ -111,10 +111,14 @@ const sendMessage = async () => {
         sessionId: currentSessionId,
         content: inputMessage.value,
       })
+      console.table(response);
       messages.value.push({
-        ...response.message,
-        timestamp: Date.now(), // 确保添加时间戳
-      });
+        username: response.message.username,
+        content: response.message.content,
+        position: response.message.position,
+        avatar: response.message.avatar,
+        timestamp: Date.now(),
+      } as Message);
       inputMessage.value = ''
       scrollToBottom()
     } catch (error) {

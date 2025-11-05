@@ -1,12 +1,10 @@
-import tornado.ioloop
-import tornado.web
 import tornado.websocket
 import json
 import asyncio
 
 # WebSocket 客户端连接池
 websocket_clients = set()
-response_queue = asyncio.Queue()
+responses = {}
 
 
 class QuestionClassifyHandler(tornado.websocket.WebSocketHandler):
@@ -21,9 +19,7 @@ class QuestionClassifyHandler(tornado.websocket.WebSocketHandler):
             data = json.loads(message)
             request_id = data.get("id")
             if request_id:
-                self.application.http_request_processor.handle_response(
-                    request_id, message
-                )
+                responses[request_id] = data
         except json.JSONDecodeError:
             print("Invalid JSON message received")
 

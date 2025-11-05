@@ -1,13 +1,12 @@
 from tornado.web import RequestHandler
 from llm import get_result
 from models.chat import chat_manager, Message
-from question_classify import get_top_n_predictions
 from typing import List, Optional
 from utils.response import APIHandler
 from utils.question_classify import QuestionClassifierUtil
 import json
 
-qc: QuestionClassifierUtil = QuestionClassifierUtil()
+qcu: QuestionClassifierUtil = QuestionClassifierUtil()
 
 
 class MessageHandler(APIHandler):
@@ -38,17 +37,17 @@ class MessageHandler(APIHandler):
             )
             session.add_message(user_message)
 
-            # TODO:
-            user_message_type = get_top_n_predictions(content, session.repository_types)
-            for type in user_message_type:
+            user_message_types = await qcu.process_request(content)
+
+            for type in user_message_types:
                 session.add_repository_type(type)
 
-            # 添加AI回复（简单的echo）
+            # 添加AI回复
             ai_message = Message(
                 username="AI助手",
                 content=get_result(
                     messages=session.messages, repository_types=session.repository_types
-                ),  # 简单的echo回复
+                ),
                 position="left",
                 avatar="/nwlt.jpg",
             )

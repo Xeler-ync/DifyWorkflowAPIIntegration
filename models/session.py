@@ -1,8 +1,9 @@
+import json
 import uuid
 from datetime import datetime
 from typing import List, Set
 from .message import Message
-from llm import RepositoryType
+from llm import RepositoryType, get_enum_item_from_value
 
 
 class ChatSession:
@@ -12,7 +13,7 @@ class ChatSession:
         self.messages: List[Message] = []
         self.created_at = datetime.now().timestamp()
         self.updated_at = datetime.now().timestamp()
-        self.repository_types: Set[RepositoryType] = set()
+        self.repository_types: Set[str] = set()  # filename without extension
 
     def add_message(self, message: Message):
         self.messages.append(message)
@@ -22,7 +23,7 @@ class ChatSession:
                 "..." if len(message.content) > 20 else ""
             )
 
-    def add_repository_type(self, repository_type: RepositoryType):
+    def add_repository_type(self, repository_type: str):
         self.repository_types.add(repository_type)
 
     @classmethod
@@ -30,18 +31,19 @@ class ChatSession:
         session = cls()
         session.id = data["id"]
         session.title = data["title"]
-        session.created_at = data["createdAt"]
-        session.updated_at = data["updatedAt"]
+        session.created_at = data["created_at"]
+        session.updated_at = data["updated_at"]
         session.messages = [Message.from_dict(msg) for msg in data["messages"]]
-        session.repository_types = data["repositoryTypes"]
+        for repository_type in data["repository_types"]:
+            session.repository_types.add(get_enum_item_from_value(repository_type))
         return session
 
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "title": self.title,
-            "createdAt": self.created_at,
-            "updatedAt": self.updated_at,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
             "messages": [msg.to_dict() for msg in self.messages],
-            "repositoryTypes": self.repository_types,
+            "repository_types": json.dumps([i for i in self.repository_types]),
         }

@@ -6,11 +6,11 @@ class ChatListHandler(APIHandler):
     async def get(self):
         """获取所有聊天会话"""
         sessions = chat_manager.get_all_sessions()
-        self.write_json([session.to_dict() for session in sessions])
+        self.write_json(sessions)
 
     async def post(self):
         """创建新的聊天会话"""
-        session = chat_manager.create_session()
+        session = await chat_manager.create_session()
         self.write_json(
             {"sessionId": session.id, "message": session.messages[0].to_dict()}
         )

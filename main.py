@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.autoreload
 from handlers.chat import ChatListHandler, ChatDetailHandler, ChatMessagesHandler
 from handlers.message import MessageHandler
+from handlers.question_classify import QuestionClassifyHandler
 from config import config
 
 
@@ -25,6 +26,7 @@ def make_app():
             (r"/api/chats/([^/]+)", ChatDetailHandler),
             (r"/api/chats/([^/]+)/messages", ChatMessagesHandler),
             (r"/api/messages", MessageHandler),
+            (r"/api/question_classify", QuestionClassifyHandler),
         ],
         debug=True,  # 开启调试模式
     )

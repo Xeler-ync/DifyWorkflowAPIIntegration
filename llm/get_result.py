@@ -1,8 +1,8 @@
+import json
 from typing import List
 from openai import OpenAI
 from config import config
 from models.message import Message
-from llm.types import RepositoryType
 
 
 client = OpenAI(api_key=config.deepseek_api_key, base_url="https://api.deepseek.com")
@@ -18,7 +18,7 @@ def read_file_content(file_name):
         return ""
 
 
-def generate_system_prompt(repository_type):
+def generate_system_prompt(repository_type: List[str]):
     """根据 repository_type 枚举值，读取对应的文件内容并合并"""
     system_prompt = """
     您是一位乐于助人的助手。
@@ -27,10 +27,14 @@ def generate_system_prompt(repository_type):
 
     <context>
     """
+
     for member in repository_type:
-        file_name = f"prompt/{member.value}.txt"  # 构造文件名
+        file_name = f"llm/prompt/{member}.md"  # 构造文件名
         content = read_file_content(file_name)
         system_prompt += content + "\n"
+    file_name = f"llm/prompt/HotelOverviewAndCoreIdentity.md"
+    content = read_file_content(file_name)
+    system_prompt += content + "\n"
     system_prompt += """
     </context>
 
@@ -47,7 +51,7 @@ def generate_system_prompt(repository_type):
     return system_prompt.strip()
 
 
-def get_result(messages: List[Message], repository_types: List[RepositoryType]):
+def get_result(messages: List[Message], repository_types: List[str]):
     content = [{"role": "system", "content": generate_system_prompt(repository_types)}]
     for message in messages:
         content.append(
@@ -56,5 +60,5 @@ def get_result(messages: List[Message], repository_types: List[RepositoryType]):
                 "content": message.content,
             }
         )
-    response = client.chat.completions.create(model="deepseek-chat", messages=messages)
+    response = client.chat.completions.create(model="deepseek-chat", messages=content)
     return response.choices[0].message.content

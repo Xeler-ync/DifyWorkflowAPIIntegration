@@ -11,7 +11,7 @@ class Message:
         self.username = username
         self.content = content
         self.position = position
-        self.timestamp = int(datetime.now().timestamp() * 1000)
+        self.timestamp = int(datetime.now().timestamp() )
         self.avatar = avatar or "./asseets/vue.svg"
 
     @classmethod

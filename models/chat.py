@@ -24,14 +24,14 @@ class ChatManager:
     async def save_session(self, session: ChatSession):
         """保存会话到JSON文件"""
         try:
-            await self.db.save_session(session.id, session.to_dict())
+            await self.db.save_session(session.id, session)
         except Exception as e:
             print(f"保存会话失败: {e}")
 
     def get_session(self, session_id: str) -> Optional[ChatSession]:
         return self.sessions.get(session_id)
 
-    def create_session(self) -> ChatSession:
+    async def create_session(self) -> ChatSession:
         session = ChatSession()
         welcome_msg = Message(
             username="AI助手",
@@ -41,7 +41,7 @@ class ChatManager:
         )
         session.add_message(welcome_msg)
         self.sessions[session.id] = session
-        self.save_session(session)
+        await self.save_session(session)
         return session
 
     async def delete_session(self, session_id: str) -> bool:
@@ -61,8 +61,8 @@ class ChatManager:
             return session.messages
         return []
 
-    def get_all_sessions(self) -> List[ChatSession]:
-        return list(self.sessions.values())
+    def get_all_sessions(self) -> List[dict]:
+        return list([items.to_dict() for items in self.sessions.values()])
 
 
 # 全局聊天管理器实例

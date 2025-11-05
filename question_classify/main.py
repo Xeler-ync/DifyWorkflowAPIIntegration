@@ -73,13 +73,19 @@ def get_top_n_predictions(
         zip(labels, probabilities[0]), key=lambda x: x[1], reverse=True
     )
 
+    with open("question_classify\data\labels.json", "r", encoding="utf-8") as f:
+        s = f.read()
+        print(s)
+        d = json.loads(s)
+
     # 返回前n个标签名称
-    return [label for label, _ in label_probabilities[:n]]
+    return [d[label] for label, _ in label_probabilities[:n]]
 
 
 # 加载模型和向量化器
 clf, vectorizer = load_model_and_vectorizer(
-    "models/random_forest_model.pkl", "models/tfidf_vectorizer.pkl"
+    "question_classify/models/random_forest_model.pkl",
+    "question_classify/models/tfidf_vectorizer.pkl",
 )
 
 
