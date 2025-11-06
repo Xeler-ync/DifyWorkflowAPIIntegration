@@ -47,3 +47,4 @@ if __name__ == "__main__":
     print(f"Server is running on http://{config.address}:{config.port}")
     tornado.autoreload.start()  # 启动自动重载
     tornado.ioloop.IOLoop.current().start()
+    print("Hello world")

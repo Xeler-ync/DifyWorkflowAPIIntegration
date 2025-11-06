@@ -95,61 +95,11 @@ def main():
     # 示例文本预测
     print(
         format_prediction(
-            "酒店官方联系电话",
-            predict_text("酒店官方联系电话", clf, vectorizer),
-            "酒店概览与核心身份",
-            clf,
-        )
-    )
-    print(
-        format_prediction(
-            "酒店设计风格",
-            predict_text("酒店设计风格", clf, vectorizer),
-            "建筑与设计风格",
-            clf,
-        )
-    )
-    print(
-        format_prediction(
-            "酒店的历史",
-            predict_text("酒店的历史", clf, vectorizer),
-            "历史与背景故事",
-            clf,
-        )
-    )
-    print(
-        format_prediction(
-            "酒店开房多少钱",
-            predict_text("酒店开房多少钱", clf, vectorizer),
-            "客房与套房类型",
-            clf,
-        )
-    )
-    print(
-        format_prediction(
-            "酒店有没有私人司机服务",
-            predict_text("酒店有没有私人司机服务", clf, vectorizer),
+            "酒店如何酒店档案室里保存的最珍贵的物品是什么？",
+            predict_text("酒店有提供特色的下午茶体验吗？", clf, vectorizer),
             "服务与特色体验",
             clf,
         )
     )
-    print(
-        format_prediction(
-            "酒店有没有泳池",
-            predict_text("酒店有没有泳池", clf, vectorizer),
-            "餐饮与娱乐设施",
-            clf,
-        )
-    )
-    print(
-        format_prediction(
-            "酒店附近有没有地铁站",
-            predict_text("酒店附近有没有地铁站", clf, vectorizer),
-            "交通与地理位置",
-            clf,
-        )
-    )
-
-
 if __name__ == "__main__":
     main()
