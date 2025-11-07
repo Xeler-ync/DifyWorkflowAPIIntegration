@@ -12,8 +12,8 @@ export interface ChatSession {
   id: string
   title: string
   messages: Message[]
-  createdAt: number
-  updatedAt: number
+  created_at: number
+  updated_at: number
 }
 
 export interface CreateChatResponse {

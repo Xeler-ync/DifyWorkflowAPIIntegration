@@ -14,7 +14,7 @@
           <div v-for="chat in chatHistory" :key="chat.id" class="chat-item"
             :class="{ active: currentChatId === chat.id }" @click="switchChat(chat.id)">
             <div class="chat-title">{{ chat.title }}</div>
-            <div class="chat-time">{{ formatTime(chat.updatedAt) }}</div>
+            <div class="chat-time">{{ formatTime(chat.updated_at) }}</div>
             <button class="delete-btn" @click.stop="handleDeleteChat(chat.id)">
               🗑️
             </button>
