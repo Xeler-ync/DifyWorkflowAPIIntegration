@@ -11,7 +11,7 @@
       <div class="chat-history">
         <div class="history-section">
           <h3>历史会话</h3>
-          <div v-for="chat in chatHistory" :key="chat.id" class="chat-item"
+          <div v-for="chat in chatHistory.slice().reverse()" :key="chat.id" class="chat-item"
             :class="{ active: currentChatId === chat.id }" @click="switchChat(chat.id)">
             <div class="chat-title">{{ chat.title }}</div>
             <div class="chat-time">{{ formatTime(chat.updated_at) }}</div>
