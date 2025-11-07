@@ -85,12 +85,21 @@ const sendMessage = async () => {
         avatar: "/fywy.gif",
         timestamp: Date.now(),  // 添加时间戳
       } as Message);
-
-      await chatService.sendMessage({
-        sessionId: currentSessionId,
-        content: inputMessage.value,
-      })
+      let ipt = inputMessage.value;
       inputMessage.value = ''
+
+      const response = await chatService.sendMessage({
+        sessionId: currentSessionId,
+        content: ipt,
+      })
+
+      messages.value.push({
+        username: response.message.username,
+        content: response.message.content,
+        position: response.message.position,
+        avatar: response.message.avatar,
+        timestamp: Date.now(),
+      } as Message);
       scrollToBottom()
     } catch (error) {
       console.error('发送消息失败:', error)
@@ -106,12 +115,14 @@ const sendMessage = async () => {
         avatar: "/fywy.gif",
         timestamp: Date.now(),  // 添加时间戳
       } as Message);
+      let ipt = inputMessage.value;
+      inputMessage.value = ''
 
       const response = await chatService.sendMessage({
         sessionId: currentSessionId,
-        content: inputMessage.value,
+        content: ipt,
       })
-      console.table(response);
+
       messages.value.push({
         username: response.message.username,
         content: response.message.content,
@@ -119,7 +130,6 @@ const sendMessage = async () => {
         avatar: response.message.avatar,
         timestamp: Date.now(),
       } as Message);
-      inputMessage.value = ''
       scrollToBottom()
     } catch (error) {
       console.error('发送消息失败:', error)

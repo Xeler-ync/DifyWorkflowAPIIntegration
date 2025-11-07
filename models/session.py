@@ -1,9 +1,9 @@
 import json
 import uuid
 from datetime import datetime
-from typing import List, Set
+from typing import List, Set, Union
 from .message import Message
-from llm import RepositoryType, get_enum_item_from_value
+from llm import RepositoryType, get_enum_item_from_value, normalize_repo_type
 
 
 class ChatSession:
@@ -13,7 +13,9 @@ class ChatSession:
         self.messages: List[Message] = []
         self.created_at = datetime.now().timestamp()
         self.updated_at = datetime.now().timestamp()
-        self.repository_types: Set[str] = set()  # filename without extension
+        self.repository_types: Set[Union[str, RepositoryType]] = (
+            set()
+        )  # filename without extension
 
     def add_message(self, message: Message):
         self.messages.append(message)
@@ -45,5 +47,7 @@ class ChatSession:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "messages": [msg.to_dict() for msg in self.messages],
-            "repository_types": json.dumps([i for i in self.repository_types]),
+            "repository_types": json.dumps(
+                [normalize_repo_type(i) for i in self.repository_types]
+            ),
         }

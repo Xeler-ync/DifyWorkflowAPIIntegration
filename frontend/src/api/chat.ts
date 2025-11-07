@@ -21,9 +21,11 @@ class ChatService {
     if (response.status === 204) {
       return {} as T
     }
-    console.log(response)
 
-    return response.json()
+    // read all of the body
+    const body = await response.text()
+
+    return JSON.parse(body)
   }
 
   // 创建新的聊天会话

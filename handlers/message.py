@@ -54,7 +54,7 @@ class MessageHandler(APIHandler):
             session.add_message(ai_message)
             # 保存会话
             await chat_manager.save_session(session)
-
+            print(ai_message.to_dict())
             self.write_json({"message": ai_message.to_dict()})
 
         except json.JSONDecodeError:
