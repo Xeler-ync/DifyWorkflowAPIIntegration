@@ -1,3 +1,4 @@
+import os
 import logging
 import tornado.web
 import tornado.ioloop
@@ -27,6 +28,14 @@ def make_app():
             (r"/api/chats/([^/]+)/messages", ChatMessagesHandler),
             (r"/api/messages", MessageHandler),
             (r"/api/question_classify", QuestionClassifyHandler),
+            (
+                r"/(.*)",
+                tornado.web.StaticFileHandler,
+                {
+                    "path": os.path.join(os.path.dirname(__file__), "frontend", "dist"),
+                    "default_filename": "index.html",
+                },
+            ),
         ],
         debug=True,  # 开启调试模式
     )
