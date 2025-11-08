@@ -15,6 +15,7 @@ import { ref, watch, nextTick } from 'vue'
 import { chatService } from '../api/chat'
 import ChatItem from './ChatItem.vue'
 import type { Message } from '../api/types'
+import { v4 as uuidv4 } from 'uuid';
 
 const props = defineProps<{
   sessionId?: string
@@ -49,7 +50,7 @@ const initSession = async () => {
     // 创建临时会话，不立即创建服务器会话
     isTemporarySession.value = true
     messages.value = [{
-      id: window.crypto.randomUUID(),  // 添加唯一ID
+      id: uuidv4(),  // 添加唯一ID
       username: "AI助手",
       content: "你好！我是AI助手，有什么可以帮助你的吗？",
       position: "left",
