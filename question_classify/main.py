@@ -87,19 +87,3 @@ clf, vectorizer = load_model_and_vectorizer(
     "question_classify/models/random_forest_model.pkl",
     "question_classify/models/tfidf_vectorizer.pkl",
 )
-
-
-# 主函数
-def main():
-
-    # 示例文本预测
-    print(
-        format_prediction(
-            "酒店如何酒店档案室里保存的最珍贵的物品是什么？",
-            predict_text("酒店有提供特色的下午茶体验吗？", clf, vectorizer),
-            "服务与特色体验",
-            clf,
-        )
-    )
-if __name__ == "__main__":
-    main()
