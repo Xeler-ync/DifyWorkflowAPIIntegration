@@ -18,7 +18,7 @@ def read_file_content(file_name):
         return ""
 
 
-def generate_system_prompt(repository_type: List[str]):
+def generate_system_prompt(repository_type: List[str], sentiment: float):
     """根据 repository_type 枚举值，读取对应的文件内容并合并"""
     system_prompt = """
     您是一位乐于助人的助手。
@@ -48,11 +48,25 @@ def generate_system_prompt(repository_type: List[str]):
 
     并根据用户问题的语言进行回答。
     """
+    if sentiment < -0.7:
+        system_prompt += """
+        【重要提示】检测到用户情绪较为负面，请按以下要求回应：
+        1. 首先表达理解和共情，如"我理解这确实让人沮丧"、"很抱歉听到您遇到这样的困难"
+        2. 在回答问题时保持温和、耐心的语气
+        3. 明确告知：我们已经为您联系了人工客服，专业人员会尽快与您联系并提供进一步帮助
+        4. 确保回答准确性的同时，给予情感支持
+        5. 结尾使用温暖的祝福语
+        """
     return system_prompt.strip()
 
 
-def get_result(messages: List[Message], repository_types: List[str]):
-    content = [{"role": "system", "content": generate_system_prompt(repository_types)}]
+def get_result(messages: List[Message], repository_types: List[str], sentiment: float):
+    content = [
+        {
+            "role": "system",
+            "content": generate_system_prompt(repository_types, sentiment),
+        }
+    ]
     for message in messages:
         content.append(
             {

@@ -6,6 +6,7 @@ import tornado.autoreload
 from handlers.chat import ChatListHandler, ChatDetailHandler, ChatMessagesHandler
 from handlers.message import MessageHandler
 from handlers.question_classify import QuestionClassifyHandler
+from handlers.sentiment_analysis import SentimentAnalysisHandler
 from config import config
 
 
@@ -28,6 +29,7 @@ def make_app():
             (r"/api/chats/([^/]+)/messages", ChatMessagesHandler),
             (r"/api/messages", MessageHandler),
             (r"/api/question_classify", QuestionClassifyHandler),
+            (r"/api/sentiment_analysis", SentimentAnalysisHandler),
             (
                 r"/(.*)",
                 tornado.web.StaticFileHandler,

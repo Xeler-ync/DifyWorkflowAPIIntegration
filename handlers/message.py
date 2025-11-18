@@ -4,9 +4,11 @@ from models.chat import chat_manager, Message
 from typing import List, Optional
 from utils.response import APIHandler
 from utils.question_classify import QuestionClassifierUtil
+from utils.sentiment_analysis import SentimentAnalysisUtil
 import json
 
 qcu: QuestionClassifierUtil = QuestionClassifierUtil()
+sau: SentimentAnalysisUtil = SentimentAnalysisUtil()
 
 
 class MessageHandler(APIHandler):
@@ -46,7 +48,9 @@ class MessageHandler(APIHandler):
             ai_message = Message(
                 username="AI助手",
                 content=get_result(
-                    messages=session.messages, repository_types=session.repository_types
+                    messages=session.messages,
+                    repository_types=session.repository_types,
+                    sentiment=await sau.process_request(content),
                 ),
                 position="left",
                 avatar="/nwlt.jpg",

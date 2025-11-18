@@ -214,3 +214,4 @@ config/config.json
 question_classify/data/processed/questions.csv
 question_classify/models
 question_classify/results
+sentiment_analysis/models
