@@ -13,15 +13,12 @@ class QuestionClassifyHandler(tornado.websocket.WebSocketHandler):
         websocket_clients.add(self)
 
     def on_message(self, message):
-        print(f"Received message from client: {message}")
-        # 将消息转发给 HTTP 请求处理程序
         try:
             data = json.loads(message)
-            request_id = data.get("id")
-            if request_id:
+            if request_id := data.get("id"):
                 responses[request_id] = data
         except json.JSONDecodeError:
-            print("Invalid JSON message received")
+            print(f"Invalid JSON message received: {message}")
 
     def on_close(self):
         print("WebSocket connection closed")

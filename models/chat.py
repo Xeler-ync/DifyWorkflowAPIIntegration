@@ -57,12 +57,10 @@ class ChatManager:
     def get_session_messages(self, session_id: str) -> List[Message]:
         """获取特定会话的所有消息"""
         session = self.get_session(session_id)
-        if session:
-            return session.messages
-        return []
+        return session.messages if session else []
 
     def get_all_sessions(self) -> List[dict]:
-        return list([items.to_dict() for items in self.sessions.values()])
+        return [items.to_dict() for items in self.sessions.values()]
 
 
 # 全局聊天管理器实例

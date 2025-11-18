@@ -24,8 +24,7 @@ def preprocess_text(text):
 def predict_text(text, clf, vectorizer):
     text = preprocess_text(text)
     text_tfidf = vectorizer.transform([text])
-    probabilities = clf.predict_proba(text_tfidf)
-    return probabilities
+    return clf.predict_proba(text_tfidf)
 
 
 # 格式化预测结果
