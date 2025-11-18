@@ -14,7 +14,7 @@ def read_file_content(file_name):
         with open(file_name, "r", encoding="utf-8") as file:
             return file.read()
     except FileNotFoundError:
-        print(f"文件 {file_name} 未找到。")
+        print(f"File {file_name} not found.")
         return ""
 
 
@@ -29,10 +29,10 @@ def generate_system_prompt(repository_type: List[str], sentiment: float):
     """
 
     for member in repository_type:
-        file_name = f"llm/prompt/{member}.md"  # 构造文件名
+        file_name = f"llm/prompt/{member}.md"
         content = read_file_content(file_name)
         system_prompt += content + "\n"
-    file_name = f"llm/prompt/HotelOverviewAndCoreIdentity.md"
+    file_name = "llm/prompt/HotelOverviewAndCoreIdentity.md"
     content = read_file_content(file_name)
     system_prompt += content + "\n"
     system_prompt += """
@@ -67,12 +67,12 @@ def get_result(messages: List[Message], repository_types: List[str], sentiment: 
             "content": generate_system_prompt(repository_types, sentiment),
         }
     ]
-    for message in messages:
-        content.append(
-            {
-                "role": "assistant" if message.position == "left" else "user",
-                "content": message.content,
-            }
-        )
+    content.extend(
+        {
+            "role": "assistant" if message.position == "left" else "user",
+            "content": message.content,
+        }
+        for message in messages
+    )
     response = client.chat.completions.create(model="deepseek-chat", messages=content)
     return response.choices[0].message.content
