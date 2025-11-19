@@ -1,7 +1,24 @@
 <template>
   <div class="main-layout">
+    <!-- 用户名输入弹窗 -->
+    <div v-if="showUsernameDialog" class="username-dialog-overlay">
+      <div class="username-dialog">
+        <h3>请输入用户名</h3>
+        <input v-model="tempUsername" @keyup.enter="saveUsername" placeholder="输入用户名" class="username-input" />
+        <div class="dialog-buttons">
+          <button @click="saveUsername" class="confirm-btn">确定</button>
+        </div>
+      </div>
+    </div>
+
     <aside class="sidebar">
       <div class="sidebar-header">
+        <div class="user-info">
+          <span class="username">{{ currentUsername }}</span>
+          <button @click="showUsernameDialog = true" class="edit-username-btn">
+            ✏️
+          </button>
+        </div>
         <button class="new-chat-btn" @click="handleCreateChat" :disabled="loading">
           <i class="icon">➕</i>
           新建对话
@@ -29,7 +46,6 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import ChatDialog from './ChatDialog.vue'
@@ -40,17 +56,41 @@ const chatRef = ref<InstanceType<typeof ChatDialog> | null>(null)
 const currentChatId = ref<string>('')
 const chatHistory = ref<ChatSession[]>([])
 const loading = ref(false)
+const showUsernameDialog = ref(false)
+const currentUsername = ref('')
+const tempUsername = ref('')
+
+// 保存用户名
+const saveUsername = () => {
+  if (!tempUsername.value.trim()) return
+  if (currentUsername.value !== tempUsername.value) {
+    currentUsername.value = tempUsername.value
+    localStorage.setItem('username', currentUsername.value)
+  }
+  showUsernameDialog.value = false
+  loadChatList()
+}
+
+// 检查用户名
+const checkUsername = () => {
+  const savedUsername = localStorage.getItem('username')
+  if (savedUsername) {
+    currentUsername.value = savedUsername
+    tempUsername.value = savedUsername
+  } else {
+    showUsernameDialog.value = true
+  }
+}
 
 // 处理新会话创建
 const handleSessionCreated = (sessionId: string) => {
   currentChatId.value = sessionId
-  loadChatList() // 重新加载会话列表
+  loadChatList()
 }
 
 // 创建新会话
 const handleCreateChat = () => {
   if (loading.value) return
-  // 不再立即创建会话，只是清空当前会话ID
   currentChatId.value = ''
 }
 
@@ -78,12 +118,10 @@ const handleDeleteChat = async (sessionId: string) => {
     loading.value = true
     await chatService.deleteChat(sessionId)
 
-    // 如果删除的是当前会话，清空当前会话ID
     if (currentChatId.value === sessionId) {
       currentChatId.value = ''
     }
 
-    // 重新加载会话列表
     await loadChatList()
   } catch (error) {
     console.error('删除会话失败:', error)
@@ -111,8 +149,9 @@ const formatTime = (timestamp: number) => {
 }
 
 // 初始化
-onMounted(async () => {
-  await loadChatList()
+onMounted(() => {
+  checkUsername()
+  loadChatList()
 })
 </script>
 
@@ -123,6 +162,87 @@ onMounted(async () => {
   background: #1a1a1a;
 }
 
+/* 用户名弹窗样式 */
+.username-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.username-dialog {
+  background: #242424;
+  padding: 24px;
+  border-radius: 12px;
+  width: 300px;
+}
+
+.username-dialog h3 {
+  color: #e0e0e0;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.username-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 8px 16px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background: #357abd;
+}
+
+/* 用户信息样式 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.username {
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.edit-username-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.edit-username-btn:hover {
+  color: #4a9eff;
+}
+
 .sidebar {
   width: 260px;
   background: #242424;
@@ -131,7 +251,6 @@ onMounted(async () => {
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  /* 防止侧边栏被压缩 */
 }
 
 .sidebar-header {
@@ -182,6 +301,7 @@ onMounted(async () => {
 }
 
 .chat-item {
+  position: relative;
   padding: 12px;
   margin-bottom: 8px;
   border-radius: 8px;
@@ -216,7 +336,6 @@ onMounted(async () => {
   overflow: hidden;
   position: relative;
   min-width: 0;
-  /* 防止flex子项溢出 */
 }
 
 .chat-history::-webkit-scrollbar {
@@ -252,14 +371,5 @@ onMounted(async () => {
 
 .delete-btn:hover {
   color: #ff4444;
-}
-
-.chat-item {
-  position: relative;
-  padding: 12px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 </style>

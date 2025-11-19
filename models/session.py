@@ -7,8 +7,9 @@ from llm import RepositoryType, get_enum_item_from_value, normalize_repo_type
 
 
 class ChatSession:
-    def __init__(self):
+    def __init__(self, username: str = None):
         self.id = str(uuid.uuid4())
+        self.username = username
         self.title = "新对话"
         self.messages: List[Message] = []
         self.created_at = datetime.now().timestamp()

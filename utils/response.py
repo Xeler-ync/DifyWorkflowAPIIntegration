@@ -8,6 +8,15 @@ class APIHandler(RequestHandler):
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
         self.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE")
 
+    def prepare(self):
+        username = self.request.headers.get("username")
+        if not username:
+            self.set_status(401)
+            self.write({"error": "Missing username"})
+            self.finish()
+            return
+        self.username = username
+
     def options(self):
         self.set_status(204)
         self.finish()

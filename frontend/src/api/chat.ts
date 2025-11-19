@@ -5,9 +5,15 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 class ChatService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const username = localStorage.getItem('username') ;
+    if (!username) {
+      // TODO: handle error
+      throw new Error('Username not found in local storage')
+    }
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         'Content-Type': 'application/json',
+        'username': username,
         ...options.headers,
       },
       ...options,

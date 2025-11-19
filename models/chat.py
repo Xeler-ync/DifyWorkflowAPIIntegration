@@ -31,8 +31,8 @@ class ChatManager:
     def get_session(self, session_id: str) -> Optional[ChatSession]:
         return self.sessions.get(session_id)
 
-    async def create_session(self) -> ChatSession:
-        session = ChatSession()
+    async def create_session(self, username: str) -> ChatSession:
+        session = ChatSession(username=username)
         welcome_msg = Message(
             username="AI助手",
             content="你好！我是AI助手，有什么可以帮助你的吗？",
@@ -59,8 +59,14 @@ class ChatManager:
         session = self.get_session(session_id)
         return session.messages if session else []
 
-    def get_all_sessions(self) -> List[dict]:
-        return [items.to_dict() for items in self.sessions.values()]
+    def get_all_sessions(self, username: str) -> List[dict]:
+        sessions = []
+        sessions.extend(
+            session.to_dict()
+            for session in self.sessions.values()
+            if session.username == username
+        )
+        return sessions
 
 
 # 全局聊天管理器实例
