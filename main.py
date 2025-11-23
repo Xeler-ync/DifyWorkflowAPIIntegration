@@ -39,6 +39,7 @@ def make_app():
                 },
             ),
         ],
+        static_hash_cache=False,
         debug=True,  # 开启调试模式
     )
 
